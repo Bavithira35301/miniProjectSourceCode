@@ -19,7 +19,7 @@ void updateRecord(FILE *fPtr);
 void newRecord(FILE *fPtr);
 void deleteRecord(FILE *fPtr);
 void displayAllRecords(FILE *fPtr);
-
+void searchRecord(FILE *fPtr);
 int main(int argc, char *argv[])
 {
     FILE *cfPtr;         // credit.dat file pointer
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     }
 
     // enable user to specify action
-    while ((choice = enterChoice()) != 6)
+    while ((choice = enterChoice()) != 7)
     {
         switch (choice)
         {
@@ -58,7 +58,12 @@ int main(int argc, char *argv[])
             displayAllRecords(cfPtr);
             break;
         case 6:
+            searchRecord(cfPtr);
+            break;
+        case 7:
             puts("Program ended.");
+            break;
+            searchRecord(cfPtr);
             break;
         } // end switch
     } // end while
@@ -216,7 +221,8 @@ unsigned int enterChoice(void)
                  "3 - add a new account\n"
                  "4 - delete an account\n"
                  "5 - display all accounts\n"
-                 "6 - end program\n? ");
+                 "6 - search an account\n"
+                 "7 - end program\n?  ");
 
     scanf("%u", &menuChoice); // receive choice from user
     return menuChoice;
@@ -239,5 +245,29 @@ void displayAllRecords(FILE *fPtr)
                    client.firstName,
                    client.balance);
         }
+    }
+}
+void searchRecord(FILE *fPtr)
+{
+    unsigned int accountNum;
+    struct clientData client = {0, "", "", 0.0};
+
+    printf("Enter account number to search (1 - 100): ");
+    scanf("%u", &accountNum);
+
+    fseek(fPtr, (accountNum - 1) * sizeof(struct clientData), SEEK_SET);
+    fread(&client, sizeof(struct clientData), 1, fPtr);
+
+    if (client.acctNum == 0)
+    {
+        printf("Account %d not found.\n", accountNum);
+    }
+    else
+    {
+        printf("\nAccount Found:\n");
+        printf("Account No: %d\n", client.acctNum);
+        printf("Last Name : %s\n", client.lastName);
+        printf("First Name: %s\n", client.firstName);
+        printf("Balance   : %.2f\n", client.balance);
     }
 }
